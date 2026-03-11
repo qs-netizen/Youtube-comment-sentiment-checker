@@ -1,0 +1,52 @@
+from googleapiclient.discovery import build
+from textblob import TextBlob
+import csv
+
+API_KEY = "Your api"
+VIDEO_ID = input("Enter YouTube Video ID: ")
+
+youtube = build("youtube", "v3", developerKey=API_KEY)
+
+
+def grade_comment(comment):
+    blob = TextBlob(comment)
+    score = blob.sentiment.polarity
+
+    if score < 0:
+        grade = "Negative"
+    elif score == 0:
+        grade = "Neutral"
+    else:
+        grade = "Positive"
+
+    return grade, score
+
+
+request = youtube.commentThreads().list(
+    part="snippet",
+    videoId=VIDEO_ID,
+    maxResults=100,
+    textFormat="plainText"
+)
+
+response = request.execute()
+
+with open("comments.csv", "w", newline="", encoding="utf-8") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Comment", "Grade", "Score"])
+
+    for item in response["items"]:
+        comment = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
+
+        grade, score = grade_comment(comment)
+
+        print("Comment:", comment)
+        print("Grade:", grade)
+        print("Score:", score)
+
+        if grade == "Negative":
+            print("⚠ Negative comment detected!")
+
+        print("-" * 40)
+
+        writer.writerow([comment, grade, score])
