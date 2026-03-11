@@ -3,7 +3,8 @@ from textblob import TextBlob
 import csv
 
 API_KEY = "Your api"
-VIDEO_ID = input("Enter YouTube Video ID: ")
+VIDEO_ID = " Eavre3RIeWw"
+# pu thi in later for now it is a test file input("Enter YouTube Video ID: ")
 
 youtube = build("youtube", "v3", developerKey=API_KEY)
 
